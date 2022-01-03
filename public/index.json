@@ -1,0 +1,10 @@
+[
+    {
+        "url": "./README.txt",
+        "isDirectory": false
+    },
+    {
+        "url": "./stuff",
+        "isDirectory": true
+    }
+]
