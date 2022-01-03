@@ -32,7 +32,11 @@ export class DOMDisplay implements Display {
     let blinkToggle = true;
     setInterval(() => {
       blinkToggle = !blinkToggle;
-      content.style.opacity = blinkToggle ? "1" : "0";
+      content.style.opacity = !document.hasFocus()
+        ? "0.5"
+        : blinkToggle
+        ? "1"
+        : "0";
     }, 500);
 
     cursor.appendChild(content);

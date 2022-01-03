@@ -1,6 +1,6 @@
 import { Command, Environment } from "./Commands/Command";
 import { Controller, ArrowEvent } from "./Controller/Controller";
-import { Display } from "./Display/Display";
+import { Color, Display } from "./Display/Display";
 import { FileSystem } from "./FileSystem/FileSystem";
 
 export class Terminal {
@@ -33,7 +33,13 @@ export class Terminal {
   #newPrompt() {
     this.#prompt = "";
     this.#index = 0;
-    this.#display.write("$ ");
+    this.#display.write([
+      { color: Color.Blue },
+      this.#fileSystem.currentDirectory.url.pathname,
+      { color: Color.Gray },
+      " $ ",
+      { color: Color.White },
+    ]);
   }
 
   async #execute(script: string) {
@@ -111,7 +117,15 @@ namespace ShellScript {
       );
       const command = commands.get(commandName);
       if (command == null) {
-        env.display.write(`command not found: ${commandName}`);
+        env.display.write([
+          {
+            color: Color.Red,
+          },
+          `command not found: ${commandName}`,
+          {
+            color: Color.White,
+          },
+        ]);
         env.display.breakLine();
       } else {
         await command.execute(env, ...args);
