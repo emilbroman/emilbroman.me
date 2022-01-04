@@ -147,5 +147,9 @@ export class Terminal {
           break;
       }
     });
+
+    this.#controller.addEventListener("activate", () => {
+      this.#display.activate();
+    });
   }
 }

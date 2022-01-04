@@ -70,6 +70,22 @@ export class DOMDisplay implements Display {
         this.#enterMode(chunk);
       }
     }
+    this.#updateScroll();
+  }
+
+  activate(): void {
+    let update: number;
+    const self = this;
+    update = requestAnimationFrame(function recur() {
+      self.#updateScroll();
+      update = requestAnimationFrame(recur);
+    });
+    setTimeout(() => {
+      cancelAnimationFrame(update);
+    }, 1000);
+  }
+
+  #updateScroll() {
     requestAnimationFrame(() => {
       this.#container.scrollIntoView({
         behavior: "smooth",

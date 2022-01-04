@@ -2,7 +2,7 @@ import { TypedEventTarget } from "./EventListener";
 
 export interface Controller
   extends TypedEventTarget<
-    InputTextEvent | SubmitEvent | ArrowEvent | BackspaceEvent
+    InputTextEvent | SubmitEvent | ArrowEvent | BackspaceEvent | ActivateEvent
   > {}
 
 export class InputTextEvent extends Event {
@@ -31,6 +31,15 @@ export class ArrowEvent extends Event {
   }
 }
 
+export namespace ArrowEvent {
+  export enum Direction {
+    Up = "ArrowUp",
+    Down = "ArrowDown",
+    Left = "ArrowLeft",
+    Right = "ArrowRight",
+  }
+}
+
 export class BackspaceEvent extends Event {
   readonly type = "backspace";
   constructor() {
@@ -38,11 +47,9 @@ export class BackspaceEvent extends Event {
   }
 }
 
-export namespace ArrowEvent {
-  export enum Direction {
-    Up = "ArrowUp",
-    Down = "ArrowDown",
-    Left = "ArrowLeft",
-    Right = "ArrowRight",
+export class ActivateEvent extends Event {
+  readonly type = "activate";
+  constructor() {
+    super("activate");
   }
 }

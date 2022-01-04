@@ -4,6 +4,7 @@ import {
   ArrowEvent,
   InputTextEvent,
   BackspaceEvent,
+  ActivateEvent,
 } from "./Controller";
 
 export class KeyboardController extends EventTarget implements Controller {
@@ -49,6 +50,7 @@ export class KeyboardController extends EventTarget implements Controller {
 
     if (document.activeElement !== this.#softwareKeyboardTarget) {
       this.#softwareKeyboardTarget.focus();
+      this.dispatchEvent(new ActivateEvent());
     }
   };
 

@@ -3,6 +3,7 @@ export interface Display {
   breakLine(): void;
   moveCursor(delta: number): void;
   delete(): void;
+  activate(): void;
 }
 export type OutputChunk = ModeChange | string;
 export type ModeChange = Partial<Mode>;
