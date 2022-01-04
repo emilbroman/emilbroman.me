@@ -10,4 +10,5 @@ export interface Environment {
   readonly fileSystem: FileSystem;
   readonly display: Display;
   readonly variables: Map<string, string>;
+  readonly commands: Map<string, Command>;
 }

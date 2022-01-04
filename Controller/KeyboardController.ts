@@ -3,9 +3,12 @@ import {
   SubmitEvent,
   ArrowEvent,
   InputTextEvent,
+  BackspaceEvent,
 } from "./Controller";
 
 export class KeyboardController extends EventTarget implements Controller {
+  #softwareKeyboardTarget?: HTMLTextAreaElement;
+
   addEventListener(
     type: string,
     callback: globalThis.EventListenerOrEventListenerObject | null,
@@ -13,6 +16,7 @@ export class KeyboardController extends EventTarget implements Controller {
   ): void {
     if (type === "input") {
       window.addEventListener("keydown", this.#onKeyDown, options);
+      window.addEventListener("touchstart", this.#onTouchStart, options);
     }
     return super.addEventListener(type, callback, options);
   }
@@ -24,9 +28,29 @@ export class KeyboardController extends EventTarget implements Controller {
   ): void {
     if (type === "input") {
       window.removeEventListener("keydown", this.#onKeyDown, options);
+      window.removeEventListener("touchstart", this.#onTouchStart, options);
     }
     return super.removeEventListener(type, callback, options);
   }
+
+  #onTouchStart = (event: TouchEvent) => {
+    if (this.#softwareKeyboardTarget == null) {
+      const element = document.createElement("textarea");
+      element.setAttribute("autocapitalize", "off");
+      element.setAttribute("autocomplete", "off");
+      element.setAttribute("autocorrect", "off");
+      element.style.position = "absolute";
+      element.style.height = "1px";
+      element.style.width = "1px";
+      element.style.left = "-1000px";
+      document.body.appendChild(element);
+      this.#softwareKeyboardTarget = element;
+    }
+
+    if (document.activeElement !== this.#softwareKeyboardTarget) {
+      this.#softwareKeyboardTarget.focus();
+    }
+  };
 
   #onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
@@ -38,6 +62,10 @@ export class KeyboardController extends EventTarget implements Controller {
       case "Enter":
         event.preventDefault();
         this.dispatchEvent(new SubmitEvent());
+        break;
+      case "Backspace":
+        event.preventDefault();
+        this.dispatchEvent(new BackspaceEvent());
         break;
       case ArrowEvent.Direction.Up:
       case ArrowEvent.Direction.Down:

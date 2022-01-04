@@ -2,6 +2,7 @@ export interface Display {
   write(chunks: Iterable<OutputChunk>): void;
   breakLine(): void;
   moveCursor(delta: number): void;
+  delete(): void;
 }
 export type OutputChunk = ModeChange | string;
 export type ModeChange = Partial<Mode>;

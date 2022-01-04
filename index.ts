@@ -9,8 +9,10 @@ import { ListCommand } from "./Commands/ListCommand";
 import { EchoCommand } from "./Commands/EchoCommand";
 import { ChangeDirectoryCommand } from "./Commands/ChangeDirectoryCommand";
 import { ProcessWorkingDirectoryCommand } from "./Commands/ProcessWorkingDirectoryCommand";
+import { CompGenCommand } from "./Commands/CompGenCommand";
 
 export const container = document.createElement("div");
+container.style.paddingBottom = "10px";
 document.body.prepend(container);
 
 const terminal = new Terminal(
@@ -26,6 +28,7 @@ const terminal = new Terminal(
     new EchoCommand(),
     new ChangeDirectoryCommand(),
     new ProcessWorkingDirectoryCommand(),
+    new CompGenCommand(),
   ]
 );
 

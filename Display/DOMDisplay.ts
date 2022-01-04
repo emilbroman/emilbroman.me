@@ -70,6 +70,13 @@ export class DOMDisplay implements Display {
         this.#enterMode(chunk);
       }
     }
+    requestAnimationFrame(() => {
+      this.#container.scrollIntoView({
+        behavior: "smooth",
+        inline: "start",
+        block: "end",
+      });
+    });
   }
 
   breakLine(): void {
@@ -77,19 +84,29 @@ export class DOMDisplay implements Display {
     this.#enterMode();
   }
 
-  moveCursor(delta: number): void {
-    let index = Array.prototype.indexOf.call(
+  #indexOfCursor(): number {
+    const index = Array.prototype.indexOf.call(
       this.#currentElement.childNodes,
       this.#cursor
     );
     if (index === -1) {
-      index = this.#currentElement.childNodes.length;
+      return this.#currentElement.childNodes.length;
     }
+    return index;
+  }
+
+  moveCursor(delta: number): void {
+    let index = this.#indexOfCursor();
     this.#cursor.remove();
     index += delta;
     this.#currentElement.insertBefore(
       this.#cursor,
       this.#currentElement.childNodes.item(index)
     );
+  }
+
+  delete(): void {
+    const index = this.#indexOfCursor();
+    this.#currentElement.childNodes.item(index - 1).remove();
   }
 }

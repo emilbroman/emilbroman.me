@@ -1,7 +1,8 @@
-import { Command, Environment } from "./Commands/Command";
+import { Command } from "./Commands/Command";
 import { Controller, ArrowEvent } from "./Controller/Controller";
 import { Color, Display } from "./Display/Display";
 import { FileSystem } from "./FileSystem/FileSystem";
+import { ShellScriptParser } from "./ShellScript/ShellScriptParser";
 
 export class Terminal {
   readonly #fileSystem: FileSystem;
@@ -23,8 +24,6 @@ export class Terminal {
     for (const command of commands) {
       this.#commands.set(command.name, command);
     }
-
-    this.#newPrompt();
   }
 
   #prompt!: string;
@@ -45,22 +44,64 @@ export class Terminal {
   async #execute(script: string) {
     try {
       const parser = new ShellScriptParser(script);
-      const ast = parser.parse();
+      var ast = parser.parse();
       await ast.execute(
         {
           fileSystem: this.#fileSystem,
           display: this.#display,
           variables: this.#variables,
+          commands: this.#commands,
         },
         this.#commands
       );
     } catch (e) {
-      this.#display.write(e instanceof Error ? e.message : String(e));
+      this.#display.write([
+        { color: Color.Red },
+        e instanceof Error ? e.message : String(e),
+        { color: Color.White },
+      ]);
       this.#display.breakLine();
     }
   }
 
   start() {
+    const start = new Date("2014-09-01");
+    const now = new Date();
+    let yearsOfExperience = now.getUTCFullYear() - start.getUTCFullYear();
+
+    const monthsDiff = now.getUTCMonth() - start.getUTCMonth();
+    const daysDiff = now.getUTCDate() - start.getUTCDate();
+
+    if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff <= 0)) {
+      yearsOfExperience--;
+    }
+
+    this.#display.write([
+      { color: Color.White, bold: true },
+      // prettier-ignore
+      "╔═╗┌┬┐┬┬    ╔╗ ┬─┐┌─┐┌┬┐┌─┐┌┐┌\n" +
+      "║╣ │││││    ╠╩╗├┬┘│ ││││├─┤│││\n" +
+      "╚═╝┴ ┴┴┴─┘  ╚═╝┴└─└─┘┴ ┴┴ ┴┘└┘\n\n",
+
+      { color: Color.Gray, bold: false },
+      "I'm a Software Engineer, currently self-employed as a consultant. ",
+      "I have more than ",
+      { color: Color.White, bold: true },
+      `${yearsOfExperience} years of experience`,
+      { color: Color.Gray, bold: false },
+      ", working mostly as a UI Engineer, ",
+      "but with a burning passion for all kinds of programming.\n\n",
+
+      "As you might be able to tell, this website takes the form of a terminal. ",
+      "If you know your stuff, you'll be able to learn more about me! :)\n\n",
+
+      { color: Color.White, bold: true },
+      "Good Luck!\n\n",
+      { bold: false },
+    ]);
+
+    this.#newPrompt();
+
     this.#controller.addEventListener("input", (event) => {
       this.#prompt =
         this.#prompt.slice(0, this.#index) +
@@ -73,6 +114,18 @@ export class Terminal {
       this.#display.breakLine();
       await this.#execute(this.#prompt);
       this.#newPrompt();
+    });
+    this.#controller.addEventListener("backspace", (event) => {
+      if (this.#index === 0) {
+        return;
+      }
+
+      this.#prompt =
+        this.#prompt.slice(0, this.#index - 1) +
+        this.#prompt.slice(this.#index);
+
+      this.#index -= 1;
+      this.#display.delete();
     });
     this.#controller.addEventListener("arrow", (event) => {
       switch (event.direction) {
@@ -94,151 +147,5 @@ export class Terminal {
           break;
       }
     });
-  }
-}
-
-namespace ShellScript {
-  export class Script {
-    constructor(readonly statements: Statement[]) {}
-
-    async execute(env: Environment, commands: Map<string, Command>) {
-      for (const statement of this.statements) {
-        await statement.execute(env, commands);
-      }
-    }
-  }
-
-  export class Statement {
-    constructor(readonly expressions: Expression[]) {}
-
-    async execute(env: Environment, commands: Map<string, Command>) {
-      const [commandName, ...args] = this.expressions.flatMap((e) =>
-        e.expand()
-      );
-      const command = commands.get(commandName);
-      if (command == null) {
-        env.display.write([
-          {
-            color: Color.Red,
-          },
-          `command not found: ${commandName}`,
-          {
-            color: Color.White,
-          },
-        ]);
-        env.display.breakLine();
-      } else {
-        await command.execute(env, ...args);
-      }
-    }
-  }
-
-  export type Expression = Term;
-
-  export type Term = StringTerm;
-
-  export class StringTerm {
-    constructor(readonly string: string) {}
-
-    expand(): string[] {
-      return [this.string];
-    }
-  }
-}
-
-class ShellScriptParser {
-  #script: string;
-
-  constructor(script: string) {
-    this.#script = script;
-  }
-
-  parse(): ShellScript.Script {
-    const statements: ShellScript.Statement[] = [];
-    while (this.#script.length > 0) {
-      statements.push(this.#parseStatement());
-    }
-    return new ShellScript.Script(statements);
-  }
-
-  #parseStatement(): ShellScript.Statement {
-    const expressions: ShellScript.Expression[] = [];
-    expressions: while (true) {
-      switch (this.#script[0]) {
-        case undefined:
-          break expressions;
-
-        case ";":
-          this.#script = this.#script.slice(1);
-          break expressions;
-
-        case " ":
-        case "\t":
-          this.#script = this.#script.slice(1);
-          break;
-
-        default:
-          expressions.push(this.#parseExpression());
-          break;
-      }
-    }
-    return new ShellScript.Statement(expressions);
-  }
-
-  #parseExpression(): ShellScript.Expression {
-    return this.#parseTerm();
-  }
-
-  #parseTerm(): ShellScript.Term {
-    return this.#parseString();
-  }
-
-  #parseString(): ShellScript.StringTerm {
-    let quoteContext: '"' | "'" | undefined;
-
-    let sawNothing = true;
-
-    let result = "";
-    while (true) {
-      if (this.#script.length === 0) {
-        break;
-      }
-
-      if (quoteContext != null && this.#script[0] === quoteContext) {
-        sawNothing = false;
-        quoteContext = undefined;
-        this.#script = this.#script.slice(1);
-        continue;
-      }
-
-      if (
-        quoteContext == null &&
-        (this.#script[0] === "'" || this.#script[0] === '"')
-      ) {
-        sawNothing = false;
-        quoteContext = this.#script[0];
-        this.#script = this.#script.slice(1);
-        continue;
-      }
-
-      if (quoteContext != null || /[\w.,@]/.test(this.#script[0])) {
-        sawNothing = false;
-        result += this.#script[0];
-        this.#script = this.#script.slice(1);
-        continue;
-      }
-
-      break;
-    }
-
-    if (sawNothing) {
-      throw new Error("expected term");
-    }
-
-    if (quoteContext != null) {
-      throw new Error(`expected closing ${quoteContext}`);
-    }
-
-    return new ShellScript.StringTerm(result);
   }
 }
