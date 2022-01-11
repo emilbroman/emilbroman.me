@@ -31,6 +31,10 @@ export class ShellScriptParser {
           this.#script = this.#script.slice(1);
           break;
 
+        case "$":
+          expressions.push(this.#parseVariable());
+          break;
+
         default:
           expressions.push(this.#parseExpression());
           break;
@@ -52,7 +56,9 @@ export class ShellScriptParser {
 
     let sawNothing = true;
 
-    let result = "";
+    const variables: ShellScript.VariableTerm[] = [];
+    const literals: string[] = [];
+    let accumulator = "";
     while (true) {
       if (this.#script.length === 0) {
         break;
@@ -75,10 +81,17 @@ export class ShellScriptParser {
         continue;
       }
 
-      if (quoteContext != null || /[\w.,@\-_]/.test(this.#script[0])) {
+      if (quoteContext != null || /[\w.,@\-_\/=]/.test(this.#script[0])) {
         sawNothing = false;
-        result += this.#script[0];
+        accumulator += this.#script[0];
         this.#script = this.#script.slice(1);
+        continue;
+      }
+
+      if (quoteContext !== "'" && this.#script[0] === "$") {
+        literals.push(accumulator);
+        accumulator = "";
+        variables.push(this.#parseVariable());
         continue;
       }
 
@@ -93,6 +106,24 @@ export class ShellScriptParser {
       throw new Error(`shell: expected closing ${quoteContext}`);
     }
 
-    return new ShellScript.StringTerm(result);
+    literals.push(accumulator);
+
+    return new ShellScript.StringTerm(literals, variables);
+  }
+
+  #parseVariable(): ShellScript.VariableTerm {
+    if (this.#script[0] !== "$") {
+      throw new Error("shell: expected `$`");
+    }
+    this.#script = this.#script.slice(1);
+    let name = "";
+    while (this.#script.length > 0 && /[\w_]/.test(this.#script[0])) {
+      name += this.#script[0];
+      this.#script = this.#script.slice(1);
+    }
+    if (name === "") {
+      throw new Error("shell: expected variable name");
+    }
+    return new ShellScript.VariableTerm(name);
   }
 }

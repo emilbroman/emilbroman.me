@@ -16,9 +16,7 @@ export namespace ShellScript {
     constructor(readonly expressions: Expression[]) {}
 
     async execute(env: Environment, commands: Map<string, Command>) {
-      const [commandName, ...args] = this.expressions.flatMap((e) =>
-        e.expand()
-      );
+      const [commandName, ...args] = this.expressions.map((e) => e.expand(env));
       const command = commands.get(commandName);
       if (command == null) {
         env.display.write([
@@ -39,13 +37,35 @@ export namespace ShellScript {
 
   export type Expression = Term;
 
-  export type Term = StringTerm;
+  export type Term = StringTerm | VariableTerm;
 
   export class StringTerm {
-    constructor(readonly string: string) {}
+    constructor(
+      readonly literals: string[],
+      readonly variables: VariableTerm[]
+    ) {
+      if (literals.length !== variables.length + 1) {
+        throw new Error(
+          "invalid string term (interpolated variables don't match surrounding literals)"
+        );
+      }
+    }
 
-    expand(): string[] {
-      return [this.string];
+    expand(env: Environment): string {
+      let result = this.literals[0];
+      for (let i = 0; i < this.variables.length; i++) {
+        result += this.variables[i].expand(env);
+        result += this.literals[i + 1];
+      }
+      return result;
+    }
+  }
+
+  export class VariableTerm {
+    constructor(readonly name: string) {}
+
+    expand(env: Environment): string {
+      return env.variables.get(this.name) ?? "";
     }
   }
 }

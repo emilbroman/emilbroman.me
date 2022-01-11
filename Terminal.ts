@@ -1,4 +1,4 @@
-import { Command } from "./Commands/Command";
+import { Command, Environment } from "./Commands/Command";
 import { Controller, ArrowEvent } from "./Controller/Controller";
 import { Color, Display } from "./Display/Display";
 import { FileSystem } from "./FileSystem/FileSystem";
@@ -22,6 +22,7 @@ export class Terminal {
     this.#controller = controller;
 
     for (const command of commands) {
+      command.init?.(this.#env());
       this.#commands.set(command.name, command);
     }
   }
@@ -41,19 +42,20 @@ export class Terminal {
     ]);
   }
 
+  #env(): Environment {
+    return {
+      fileSystem: this.#fileSystem,
+      commands: this.#commands,
+      display: this.#display,
+      variables: this.#variables,
+    };
+  }
+
   async #execute(script: string) {
     try {
       const parser = new ShellScriptParser(script);
       var ast = parser.parse();
-      await ast.execute(
-        {
-          fileSystem: this.#fileSystem,
-          display: this.#display,
-          variables: this.#variables,
-          commands: this.#commands,
-        },
-        this.#commands
-      );
+      await ast.execute(this.#env(), this.#commands);
     } catch (e) {
       this.#display.write([
         { color: Color.Red },

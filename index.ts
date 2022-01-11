@@ -10,6 +10,9 @@ import { EchoCommand } from "./Commands/EchoCommand";
 import { ChangeDirectoryCommand } from "./Commands/ChangeDirectoryCommand";
 import { ProcessWorkingDirectoryCommand } from "./Commands/ProcessWorkingDirectoryCommand";
 import { CompGenCommand } from "./Commands/CompGenCommand";
+import { EnvCommand } from "./Commands/EnvCommand";
+import { SetCommand } from "./Commands/SetCommand";
+import { OpenCommand } from "./Commands/OpenCommand";
 
 export const container = document.createElement("div");
 container.style.paddingBottom = "10px";
@@ -29,6 +32,9 @@ const terminal = new Terminal(
     new ChangeDirectoryCommand(),
     new ProcessWorkingDirectoryCommand(),
     new CompGenCommand(),
+    new EnvCommand(),
+    new SetCommand(),
+    new OpenCommand(),
   ]
 );
 

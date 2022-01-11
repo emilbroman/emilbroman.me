@@ -3,6 +3,7 @@ import { FileSystem } from "../FileSystem/FileSystem";
 
 export interface Command {
   readonly name: string;
+  init?(env: Environment): void;
   execute(env: Environment, ...args: string[]): Promise<void>;
 }
 

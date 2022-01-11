@@ -8,7 +8,7 @@ export class FetchFileSystemContents implements FileSystemContents {
     const response = await fetch(url.href);
 
     if (response.status === 404) {
-      return [];
+      throw new Error("no such file or directory");
     }
 
     const contents: { url: string; isDirectory: boolean }[] =
