@@ -4,7 +4,7 @@
     "vite": "^2.7.10"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && node create-indices.js",
     "start": "vite"
   }
 }
