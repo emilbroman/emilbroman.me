@@ -41,6 +41,7 @@ export class OpenCommand implements Command {
 
         case "txt":
         case "md":
+        case "pdf":
           window.open(new URL(arg, env.fileSystem.currentDirectory.url));
           break;
 
