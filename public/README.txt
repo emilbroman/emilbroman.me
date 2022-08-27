@@ -9,3 +9,7 @@ You can do that by running this command:
 You can list all available commands like this:
 
     $ compgen -c
+
+My CV is available at <https://emilbroman.me/CV.pdf>, or by using:
+
+    $ open CV.pdf
