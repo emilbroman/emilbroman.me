@@ -10,7 +10,7 @@ jobs:
           DOCKER_BUILDKIT: "1"
         with:
           gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-          registry: europe-north1-docker.pkg.dev/emilbroman
+          registry: europe-north1-docker.pkg.dev
           project_id: emilbroman
           image_name: website
           image_tag: latest,${{ github.sha }}
