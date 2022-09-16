@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: RafikFarhad/push-to-gcr-github-action@v4.1
         env:
           DOCKER_BUILDKIT: "1"
@@ -14,3 +15,12 @@ jobs:
           project_id: emilbroman
           image_name: website/website
           image_tag: latest,${{ github.sha }}
+
+      - uses: ameydev/gke-kubectl-action@master
+        env:
+          PROJECT_ID: emilbroman
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          CLUSTER_NAME: emilbroman
+          ZONE_NAME: europe-north1-a
+        with:
+          args: set image apps.deployment/website website=europe-north1-docker.pkg.dev/emilbroman/website/website:${{ github.sha }}
