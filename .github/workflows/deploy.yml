@@ -23,4 +23,4 @@ jobs:
           CLUSTER_NAME: emilbroman
           ZONE_NAME: europe-north1-a
         with:
-          args: set image apps.deployment/website website=europe-north1-docker.pkg.dev/emilbroman/website/website:${{ github.sha }}
+          args: set image deployment/website website=europe-north1-docker.pkg.dev/emilbroman/website/website:${{ github.sha }}
