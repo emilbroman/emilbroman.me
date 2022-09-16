@@ -16,7 +16,8 @@ COPY . .
 RUN --mount=type=cache,target=node_modules \
   yarn --pure-lockfile
 
-RUN yarn build
+RUN --mount=type=cache,target=node_modules \
+  yarn build
 
 FROM nginx:alpine
 
