@@ -1,11 +1,10 @@
 {
   "devDependencies": {
-    "md-to-pdf": "^5.1.0",
     "typescript": "^4.5.4",
     "vite": "^2.7.10"
   },
   "scripts": {
-    "build": "vite build && md-to-pdf < public/CV.md > dist/CV.pdf && node create-indices.js",
+    "build": "vite build && pandoc public/CV.md -s -o dist/CV.pdf && node create-indices.js",
     "start": "vite"
   }
 }
