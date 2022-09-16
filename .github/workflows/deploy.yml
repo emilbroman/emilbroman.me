@@ -6,6 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: RafikFarhad/push-to-gcr-github-action@v4.1
+        env:
+          DOCKER_BUILDKIT: "1"
         with:
           gcloud_service_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
           registry: europe-north1-docker.pkg.dev/emilbroman

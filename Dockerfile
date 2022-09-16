@@ -13,8 +13,8 @@ WORKDIR /app
 
 COPY . .
 
-#RUN --mount=type=cache,target=node_modules \
-RUN yarn --pure-lockfile
+RUN --mount=type=cache,target=node_modules \
+  yarn --pure-lockfile
 
 RUN yarn build
 
