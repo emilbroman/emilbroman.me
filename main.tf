@@ -72,7 +72,8 @@ resource "google_artifact_registry_repository" "this" {
 
 resource "google_service_account" "this" {
   account_id   = "website"
-  display_name = "Website at https://emilbroman.me"
+  display_name = "Website"
+  description  = "Website at https://emilbroman.me"
 }
 
 resource "google_service_account_key" "this" {

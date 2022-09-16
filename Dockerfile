@@ -21,4 +21,10 @@ RUN --mount=type=cache,target=node_modules \
 
 FROM nginx:alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+RUN mkdir /app
+
+WORKDIR /app
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=builder /app/dist .
