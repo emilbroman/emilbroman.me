@@ -1,6 +1,8 @@
 locals {
   domain = data.terraform_remote_state.cloud.outputs.domain
   zone   = data.terraform_remote_state.cloud.outputs.dns_zone_name
+
+  dmarc_reports_address = "dmarc@${local.domain}"
 }
 
 resource "google_dns_record_set" "atproto" {
@@ -54,5 +56,5 @@ resource "google_dns_record_set" "dmarc" {
 
   managed_zone = local.zone
 
-  rrdatas = ["\"v=DMARC1;p=reject\""]
+  rrdatas = ["\"v=DMARC1;p=none;ruf=mailto:${local.dmarc_reports_address};rua=mailto:${local.dmarc_reports_address}\""]
 }
