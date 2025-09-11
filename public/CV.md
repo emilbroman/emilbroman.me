@@ -1,6 +1,6 @@
 # Emil Broman
 
-## Software Engineering Consultant
+## Software Engineering Contractor
 
 Active since late 2014, I'm an experienced developer with a professional, pragmatic,
 and passionate approach to software design.
@@ -11,16 +11,19 @@ across the stack to systems programming and compiler implementation.
 
 ## Experience (reverse chronological order)
 
-### 2022–present: [Emil Broman AB](https://emilbroman.me) – My own consultancy company
+### 2022–present: [Emil Broman AB](https://emilbroman.me) – Freelance
 
-I finally took the plunge and started my own business at the very end of 2021, and has
-since worked with [Mevisio](https://mevisio.com), a highly customizable, highly
+I finally took the plunge and started my own business at the very end of 2021, starting
+working with [Mevisio](https://mevisio.com), a highly customizable, highly
 configurable, SaaS product that allows users to tailor interactive screens to their
 unique workflows.
 
 Working across the full stack as one of only a few developers, I worked with front-end,
 back-end, devops, and infrastructure. Technologies and languages used include TypeScript,
 Node.js, React, RabbitMQ, MongoDB, Terraform, AWS.
+
+The Mevisio assignment also gave me the opportunity to do compiler engineering, implementing
+a DSL for the product.
 
 ### 2019-2021: [EQT](https://eqtgroup.com) – Sweden's largest Private Equity firm
 
